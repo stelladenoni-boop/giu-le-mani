@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#231a31">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Giù le Mani">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Giù le Mani</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); background: #231a31; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+/* Layout: one phone-width column; a big streak card on top, then motivation, rewards, scary facts, history. */
+:root {
+  /* Un solo look scuro, abbinato all'icona (mano rosa su fondo prugna) */
+  --bg: #231a31;
+  --surface: #2e2440;
+  --sunk: #3a2f4e;
+  --ink: #f6f0fb;
+  --muted: #b3a8c6;
+  --line: #4b3f61;
+  --accent: #ff6a9b;
+  --accent-ink: #2a0f1a;
+  --accent-soft: #4a2440;
+  --good: #5fd39c;
+  --good-soft: #1d4535;
+  --danger: #ff8a7a;
+  --danger-soft: #45242a;
+  --nail: #f3b6c8;
+  --nail-tip: #fff6f8;
+  --skin: #c99580;
+  --gift: #4d3d17;
+  --gift-ink: #ffcf5a;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 540px; margin: 0 auto; padding: 20px 16px 56px; display: flex; flex-direction: column; gap: 18px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.15; }
+h2 { font-size: 1.3rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 700; color: var(--muted); }
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -.01em; }
+.brand span { color: var(--accent); }
+.top .who { color: var(--muted); font-size: .9rem; }
+
+.panel { background: var(--surface); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.flat { padding: 4px 4px 0; display: flex; flex-direction: column; gap: 12px; }
+
+/* Streak card */
+.hero { background: var(--surface); border-radius: 24px; padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 18px; border: 2px solid var(--line); }
+.hero-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.count { font-family: var(--display); font-weight: 800; font-size: clamp(4.4rem, 22vw, 6.5rem); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.count-label { font-family: var(--display); font-size: 1.15rem; font-weight: 700; margin-top: 6px; }
+.count-sub { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+.nail-fig { width: 104px; text-align: center; }
+.nail-fig svg { width: 104px; height: auto; display: block; }
+.nail-fig .mm { font-family: var(--display); font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.nail-fig .mm-l { font-size: .75rem; color: var(--muted); line-height: 1.3; }
+
+.btn { font: inherit; font-weight: 700; border: 0; border-radius: 14px; padding: 15px 18px; cursor: pointer; font-size: 1.05rem; width: 100%; }
+.btn:focus-visible, .link:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn-main { background: var(--accent); color: var(--accent-ink); }
+.btn-main:active { transform: scale(.985); }
+.btn-locked { background: var(--sunk); color: var(--muted); cursor: not-allowed; }
+.btn-done { background: var(--good-soft); color: var(--good); cursor: default; }
+.btn-ghost { background: var(--sunk); color: var(--ink); }
+.btn-danger { background: var(--danger); color: var(--surface); }
+.link { background: none; border: 0; font: inherit; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 6px; font-size: .92rem; }
+.actions { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.confirm { background: var(--danger-soft); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.confirm p { font-weight: 600; }
+.confirm .row { display: flex; gap: 10px; }
+.confirm .row .btn { font-size: .98rem; padding: 12px; }
+.relapsed { background: var(--sunk); border-radius: 14px; padding: 14px 16px; font-weight: 600; text-align: center; }
+
+/* Setup */
+.setup { display: flex; flex-direction: column; gap: 14px; }
+.setup h1 { font-size: 1.9rem; font-weight: 800; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 600; }
+.field input { font: inherit; font-size: 1.05rem; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; }
+.hint { color: var(--muted); font-size: .88rem; }
+
+/* Rules */
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rules li { background: var(--sunk); border-radius: 12px; padding: 10px 14px; font-size: .95rem; }
+.rules b { color: var(--accent); }
+.howto { background: var(--surface); border-radius: 20px; padding: 4px 18px; }
+.howto summary { cursor: pointer; font-weight: 700; padding: 12px 0; }
+.howto .rules { padding-bottom: 14px; }
+
+/* Quote */
+.quote { font-family: var(--display); font-size: 1.35rem; font-weight: 600; line-height: 1.3; text-wrap: pretty; }
+.quote-panel { background: var(--accent-soft); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+/* Next reward */
+.bar { height: 12px; border-radius: 99px; background: var(--sunk); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .6s ease; }
+.next-row { display: flex; justify-content: space-between; gap: 12px; font-size: .92rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.reward-line { font-weight: 600; }
+.reward-line b { color: var(--accent); }
+
+/* Badges */
+.badges { display: grid !important; grid-template-columns: repeat(10, 1fr) !important; gap: 6px !important; }
+.cal { aspect-ratio: 1; max-width: 100%; border-radius: 50%; display: grid; place-items: center; background: var(--sunk); color: var(--muted); font-family: var(--display); font-weight: 700; font-size: clamp(.62rem, 2.6vw, .85rem); font-variant-numeric: tabular-nums; }
+.cal.big { background: var(--gift); color: var(--gift-ink); box-shadow: inset 0 0 0 2px var(--gift-ink); position: relative; }
+.cal.big::after { content: ""; position: absolute; top: -2px; right: -2px; width: 30%; height: 30%; border-radius: 50%; background: var(--gift-ink); border: 2px solid var(--bg); }
+.cal.big.on { background: var(--accent); color: var(--accent-ink); }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted); }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cal-legend i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.cal.past { background: var(--accent-soft); }
+.cal.on { background: var(--accent); color: var(--accent-ink); }
+.cal.next { outline: 2px dashed var(--accent); outline-offset: 1px; }
+.badges-old { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
+.badge { border-radius: 16px; padding: 12px 8px 10px; text-align: center; background: var(--sunk); color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.medal { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 1.25rem; border: 3px dashed var(--line); font-variant-numeric: tabular-nums; }
+.badge .bn { font-size: .78rem; font-weight: 700; line-height: 1.2; }
+.badge .bd { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; }
+.badge.on { background: var(--accent-soft); color: var(--ink); }
+.badge.on .medal { background: var(--accent); color: var(--accent-ink); border: 3px solid var(--accent); }
+.badge.past .medal { border-style: solid; }
+.badge.next { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* Facts */
+.fact { border-radius: 20px; padding: 20px; background: var(--danger-soft); display: flex; flex-direction: column; gap: 10px; }
+.fact h3 { font-size: 1.2rem; }
+.fact .eyebrow { color: var(--danger); }
+.hook { font-weight: 700; }
+.risks { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
+.risks li::marker { color: var(--danger); }
+.fact .risk-l, .fact-list .risk-l { color: var(--danger); margin-top: 4px; }
+.fact-list li { gap: 8px !important; }
+.fact .src { font-size: .8rem; color: var(--muted); }
+details.all { background: var(--surface); border-radius: 20px; padding: 6px 18px; }
+details.all summary { cursor: pointer; font-weight: 700; padding: 12px 0; list-style-position: inside; }
+.fact-list { list-style: none; padding: 0 0 14px; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.fact-list li { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid var(--line); padding-top: 12px; }
+.fact-list b { font-family: var(--display); font-size: 1.02rem; }
+
+/* Tips */
+.tips { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tips li { background: var(--surface); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+.tips b { font-weight: 700; }
+
+/* Owner panel */
+.admin { background: var(--surface); border: 2px dashed var(--accent); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.admin-list summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
+.admin-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.arow { display: grid; grid-template-columns: 3.2rem 1fr; gap: 6px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.arow .dn { font-family: var(--display); font-weight: 800; font-size: 1.05rem; grid-row: span 2; text-align: center; }
+.arow input { font: inherit; font-size: .95rem; padding: 9px 11px; border-radius: 10px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; min-width: 0; }
+.arow input.ms { font-size: .85rem; padding: 7px 11px; }
+.arow input.ms:not(:placeholder-shown) { border-color: var(--accent); }
+.arow input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.admin-bar { position: sticky; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); background: var(--surface); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.admin textarea { font: inherit; font-size: .95rem; line-height: 1.6; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; resize: vertical; counter-reset: none; }
+.admin textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Daily prizes */
+.coll { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.coll li { border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: 2.6rem 1fr auto; gap: 12px; align-items: center; background: var(--sunk); color: var(--muted); }
+.coll li.won { background: var(--accent-soft); color: var(--ink); }
+.coll li.got { background: var(--good-soft); }
+.coll .cm { width: 2.6rem; height: 2.6rem; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 800; border: 2px dashed var(--line); font-variant-numeric: tabular-nums; }
+.coll li.won .cm { background: var(--accent); color: var(--accent-ink); border: 0; }
+.coll li.got .cm { background: var(--good); color: var(--surface); border: 0; }
+.coll .ct { display: flex; flex-direction: column; min-width: 0; }
+.coll .ct b { font-family: var(--display); }
+.coll .ct span { font-size: .9rem; overflow-wrap: anywhere; }
+.coll label { display: flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.coll input[type=checkbox] { width: 1.3rem; height: 1.3rem; accent-color: var(--good); }
+.loot { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+.loot li { background: var(--accent-soft); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; font-weight: 600; }
+.loot .ld { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+/* History */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { background: var(--sunk); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 1.6rem; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat .l { font-size: .78rem; color: var(--muted); }
+.days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+.day { aspect-ratio: 1; max-width: 100%; border-radius: 6px; background: var(--sunk); }
+.day.ok { background: var(--good); }
+.day.pending { background: var(--good-soft); box-shadow: inset 0 0 0 2px var(--good); }
+.day.bad { background: var(--danger); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.foot { color: var(--muted); font-size: .82rem; text-align: center; }
+
+/* Celebration */
+.overlay { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 55%, transparent); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.cele { background: var(--surface); border-radius: 26px; padding: 28px 22px 20px; max-width: 380px; width: 100%; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; animation: pop .45s cubic-bezier(.2,1.4,.4,1); }
+.cele .medal { width: 96px; height: 96px; font-size: 2.2rem; background: var(--accent); color: var(--accent-ink); border: 0; }
+.cele h2 { font-size: 1.6rem; }
+.cele .prize { background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; font-weight: 600; width: 100%; }
+/* Festa: palloncini e coriandoli */
+.party { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.balloon { position: absolute; bottom: -140px; width: 56px; height: 70px; border-radius: 50% 50% 48% 48%; animation: rise var(--dur) cubic-bezier(.3,.1,.5,1) var(--delay) forwards; }
+.balloon::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); border: 6px solid transparent; border-bottom-color: inherit; border-top: 0; width: 0; height: 0; border-bottom-color: var(--c); }
+.balloon::after { content: ""; position: absolute; left: 50%; top: 100%; width: 1.5px; height: 70px; background: color-mix(in srgb, var(--ink) 40%, transparent); }
+.balloon i { position: absolute; top: 14%; left: 22%; width: 22%; height: 18%; border-radius: 50%; background: rgba(255,255,255,.55); }
+@keyframes rise {
+  0% { transform: translate(0, 0) rotate(-4deg); opacity: 1; }
+  50% { transform: translate(var(--sway), -55vh) rotate(5deg); }
+  100% { transform: translate(calc(var(--sway) * -1), calc(-100vh - 220px)) rotate(-3deg); opacity: 1; }
+}
+.confetto { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; animation: fall var(--dur) linear var(--delay) forwards; }
+@keyframes fall { to { transform: translate(var(--sway), calc(100vh + 40px)) rotate(var(--rot)); } }
+.yuppi { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); font-family: var(--display); font-weight: 800; font-size: clamp(2.6rem, 14vw, 4.5rem); color: var(--accent); text-shadow: 0 3px 0 var(--surface); animation: yuppi 1.6s cubic-bezier(.2,1.5,.4,1) forwards; white-space: nowrap; }
+@keyframes yuppi { 0% { transform: translateX(-50%) scale(.3); opacity: 0; } 20% { transform: translateX(-50%) scale(1.15); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(-50%) scale(1) translateY(-30px); opacity: 0; } }
+@keyframes pop { from { transform: scale(.7); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .party { display: none; } .cele { animation: none; } .bar i { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Giù le <span>Mani</span></div>
+    <div class="who" id="who"></div>
+  </header>
+
+
+  <section class="panel" id="percorso">
+    <h2>Il tuo percorso</h2>
+    <div class="stats">
+      <div class="stat"><span class="v" id="s-best">0</span><span class="l">giorni di record</span></div>
+      <div class="stat"><span class="v" id="s-check">0</span><span class="l">giorni segnati</span></div>
+      <div class="stat"><span class="v" id="s-relapse">0</span><span class="l">ripartenze</span></div>
+    </div>
+    <div class="eyebrow">Ultime due settimane</div>
+    <div class="days" id="days"></div>
+    <div class="legend">
+      <span><i style="background:var(--good)"></i>Ce l'ho fatta</span>
+      <span><i style="background:var(--good-soft);box-shadow:inset 0 0 0 2px var(--good)"></i>Dimenticato di segnarlo</span>
+      <span><i style="background:var(--danger)"></i>Ho ceduto</span>
+    </div>
+
+  </section>
+
+  <section class="hero" id="hero" aria-live="polite"></section>
+
+
+  <details class="howto" id="howto">
+    <summary>Come funziona</summary>
+    <ul class="rules">
+      <li><b>Ogni sera dalle 22</b> premi "Oggi non le ho mangiate" e scopri la sorpresa della sera.</li>
+      <li><b>Le caselle gialle</b> nel calendario sono i traguardi speciali. Lì ti aspetta un premio vero di Stella.</li>
+      <li><b>I premi vinti</b> finiscono nella tua collezione. Spunta "Ricevuto" quando Stella te lo consegna.</li>
+      <li><b>Se cedi</b>, premi "Ho ceduto" e sii onesto. Si riparte da zero e i premi non ancora ritirati non valgono più.</li>
+    </ul>
+  </details>
+
+  <section class="quote-panel">
+    <div class="eyebrow" id="quote-eyebrow">Frase del giorno</div>
+    <p class="quote" id="quote"></p>
+  </section>
+
+  <section class="panel">
+    <div class="eyebrow" id="next-eyebrow">Il premio di stasera</div>
+    <p class="quote" id="next-reward"></p>
+    <p class="hint" id="next-when"></p>
+    <div class="bar" role="progressbar" aria-label="Progresso verso il prossimo premio" id="bar"><i id="bar-fill" style="width:0%"></i></div>
+    <div class="next-row"><span id="next-left"></span><span id="next-at" style="white-space:nowrap"></span></div>
+  </section>
+
+  <section class="flat">
+    <h2>Le tue medaglie</h2>
+    <p class="hint">Una medaglia per ogni giorno, per tre mesi. Ogni sera dalle 22 segni la giornata, la sblocchi e scopri la sorpresa.</p>
+    <div class="badges" id="badges"></div>
+    <div class="cal-legend"><span><i style="background:var(--accent)"></i>Giorno fatto</span><span><i style="background:var(--gift);box-shadow:inset 0 0 0 2px var(--gift-ink)"></i>Traguardo speciale: c'è un premio vero</span></div>
+    <p class="hint" id="badges-note"></p>
+  </section>
+
+  <section class="fact" id="fact"></section>
+
+  <details class="all">
+    <summary>Tutte le cose che succedono quando ti mangi le unghie</summary>
+    <ul class="fact-list" id="fact-list"></ul>
+  </details>
+
+  <section class="flat">
+    <h2>Quando ti viene voglia</h2>
+    <p class="hint">I due di sempre, più tre nuovi ogni giorno.</p>
+    <ul class="tips" id="tips"></ul>
+  </section>
+
+  <section class="panel">
+    <h2>La tua collezione</h2>
+    <p class="hint">Ogni traguardo speciale vale un premio vero. Quando Stella te lo consegna, spunta "Ricevuto". Attento: se cedi si riparte da zero e i premi non ancora ritirati non valgono più.</p>
+    <ul class="coll" id="coll"></ul>
+  </section>
+
+
+
+  <section class="flat">
+    <details>
+      <summary class="hint" style="cursor:pointer">Impostazioni</summary>
+      <div class="actions" style="align-items:stretch; margin-top:12px; gap:10px">
+        <button class="link" id="wipe" type="button">Cancella tutto e ricomincia da zero</button>
+        <div id="wipe-confirm" class="confirm" hidden>
+          <p>Cancello record, premi e storico. Sei sicuro?</p>
+          <div class="row"><button class="btn btn-danger" id="wipe-yes" type="button">Sì, cancella</button><button class="btn btn-ghost" id="wipe-no" type="button">No</button></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <p class="foot" id="foot">I progressi restano salvati su questo telefono.</p>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="cele" role="dialog" aria-modal="true" aria-labelledby="cele-title">
+    <div class="medal" id="cele-medal">3</div>
+    <div class="eyebrow" id="cele-eyebrow">Medaglia sbloccata</div>
+    <h2 id="cele-title"></h2>
+    <p id="cele-text"></p>
+    <div class="prize" id="cele-prize"></div>
+    <p class="hint" id="cele-claim">L'hai aggiunto alla tua collezione. Quando Stella te lo consegna, spunta "Ricevuto".</p>
+    <button class="btn btn-main" id="cele-close" type="button">Grande!</button>
+  </div>
+</div>
+
+<script src="backend.js"></script>
+<script>
+/* Medaglie: solo nome e giorno. I premi stanno in PRIZES / premi.json */
+let SPECIAL = {"1": "Il primo passo", "3": "Tre di fila", "7": "Una settimana pulita", "10": "Doppia cifra", "14": "Due settimane da leone", "18": "Maggiorenne", "21": "Nuova abitudine", "26": "Quasi un mese", "30": "Un mese intero", "34": "Mani nuove", "40": "Quaranta e non sentirli", "45": "Un mese e mezzo", "50": "Mezzo secolo", "54": "Inarrestabile", "60": "Due mesi", "64": "Unghie da mostrare", "67": "Sessantasette e non si molla", "70": "Settanta volte sì", "79": "Quasi in vetta", "84": "Dodici settimane", "87": "Ultimo sprint", "90": "Tre mesi: ce l'hai fatta"};
+// Una medaglia per ogni giorno, dal primo al novantesimo
+let MILESTONES, BIG;
+function buildMilestones() {
+  MILESTONES = Array.from({ length: 90 }, (_, i) => ({ d: i + 1, name: SPECIAL[i + 1] || "Giorno " + (i + 1), big: !!SPECIAL[i + 1] }));
+  BIG = MILESTONES.filter(m => m.big);
+}
+buildMilestones();
+
+/* Premi giorno per giorno: li scrive Stella dal pannello "Gestione premi" (file premi.json) */
+const FALLBACK_PRIZE = ""; // riga vuota = niente premio, solo "Bravo"
+let PRIZES = ["", "Il secondo giorno è quello in cui molti mollano. Tu no.", "", "Ogni voglia che lasci passare è una vittoria.", "Le tue dita ti ringraziano.", "Un'altra sera pulita. Così si fa.", "", "Stai diventando più forte dell'abitudine.", "Stasera le unghie sono un po' più lunghe di ieri.", "", "Nessuno ti regala questi giorni: te li sei presi tu.", "Continua così, la strada è quella giusta.", "Hai resistito anche oggi. Non è poco.", "", "Il tuo record cresce ogni sera.", "Stai costruendo qualcosa che si vede.", "Testa dura, mani libere.", "", "Pensa a dove eri il primo giorno.", "Le abitudini si battono una sera alla volta.", "", "Fiera di te. Firmato: Stella.", "Un altro mattoncino nel muro.", "Se oggi è stata dura, vale doppio.", "Le mani parlano di te: oggi dicono bene.", "", "Un passo avanti, ancora.", "Il secondo giorno è quello in cui molti mollano. Tu no.", "Ogni voglia che lasci passare è una vittoria.", "", "Le tue dita ti ringraziano.", "Un'altra sera pulita. Così si fa.", "Stai diventando più forte dell'abitudine.", "", "Stasera le unghie sono un po' più lunghe di ieri.", "Nessuno ti regala questi giorni: te li sei presi tu.", "Continua così, la strada è quella giusta.", "Hai resistito anche oggi. Non è poco.", "Il tuo record cresce ogni sera.", "", "Stai costruendo qualcosa che si vede.", "Testa dura, mani libere.", "Oggi è andata. Domani pure.", "Pensa a dove eri il primo giorno.", "", "Le abitudini si battono una sera alla volta.", "Fiera di te. Firmato: Stella.", "Un altro mattoncino nel muro.", "Se oggi è stata dura, vale doppio.", "", "Le mani parlano di te: oggi dicono bene.", "Un passo avanti, ancora.", "Il secondo giorno è quello in cui molti mollano. Tu no.", "", "Ogni voglia che lasci passare è una vittoria.", "Le tue dita ti ringraziano.", "Un'altra sera pulita. Così si fa.", "Stai diventando più forte dell'abitudine.", "Stasera le unghie sono un po' più lunghe di ieri.", "", "Nessuno ti regala questi giorni: te li sei presi tu.", "Continua così, la strada è quella giusta.", "Hai resistito anche oggi. Non è poco.", "", "Il tuo record cresce ogni sera.", "Stai costruendo qualcosa che si vede.", "", "Oggi è andata. Domani pure.", "Pensa a dove eri il primo giorno.", "", "Le abitudini si battono una sera alla volta.", "Fiera di te. Firmato: Stella.", "Un altro mattoncino nel muro.", "Se oggi è stata dura, vale doppio.", "Le mani parlano di te: oggi dicono bene.", "Un passo avanti, ancora.", "Il secondo giorno è quello in cui molti mollano. Tu no.", "Ogni voglia che lasci passare è una vittoria.", "", "Le tue dita ti ringraziano.", "Un'altra sera pulita. Così si fa.", "Stai diventando più forte dell'abitudine.", "Stasera le unghie sono un po' più lunghe di ieri.", "", "Nessuno ti regala questi giorni: te li sei presi tu.", "Continua così, la strada è quella giusta.", "", "Hai resistito anche oggi. Non è poco.", "Il tuo record cresce ogni sera.", ""];
+const prizeFor = day => (PRIZES[day - 1] || "").trim() || FALLBACK_PRIZE;
+const hasPrize = day => !!prizeFor(day);
+
+const EARLY = [
+  "Il primo giorno è il più difficile. Stai già facendo la cosa più dura: iniziare.",
+  "Secondo giorno. La voglia arriva a ondate e ogni ondata passa in pochi minuti. Lasciala passare.",
+  "Terzo giorno: il cervello si sta accorgendo che qualcosa è cambiato. Tieni duro, il peggio dura poco.",
+  "Quarto giorno. Ogni volta che resisti, l'abitudine perde un po' di forza.",
+  "Cinque giorni. Guardati le dita: si vede già la differenza sui bordi.",
+  "Sesto giorno. Non serve essere perfetti, serve esserci anche oggi.",
+  "Una settimana! La maggior parte delle persone molla prima di arrivare qui. Tu no.",
+  "Ottavo giorno. Adesso non stai solo resistendo: stai costruendo un'abitudine nuova.",
+  "Nono giorno. Quando la voglia arriva, ormai sai come farla passare.",
+  "Dieci giorni. Le unghie sono già cresciute di circa un millimetro. Un millimetro tutto tuo."
+];
+const POOL = [
+  "Le mani si ricordano di quello che fai ogni giorno. Oggi insegnagli una cosa nuova.",
+  "Una giornata alla volta. Oggi è l'unica che conta.",
+  "La voglia dura due minuti. La soddisfazione dura molto di più.",
+  "Non stai rinunciando a niente: ti stai riprendendo le tue mani.",
+  "Ogni giorno pulito rende più facile il prossimo.",
+  "Se ti scopri con le dita in bocca, toglile e basta. Nessun dramma, si continua.",
+  "Le unghie crescono circa un decimo di millimetro al giorno. Anche oggi stai guadagnando terreno.",
+  "Sei più forte di un'abitudine.",
+  "Stress? Pugno chiuso, tre respiri lenti, e passa.",
+  "Pensa a quanto saranno belle tra un mese.",
+  "Chi ti vede le mani adesso nota la differenza, anche se non lo dice.",
+  "Il record di oggi è il punto di partenza di domani.",
+  "Non contano i giorni facili. Contano quelli in cui avevi voglia e non l'hai fatto.",
+  "Ancora qui, ancora pulito. Continua così."
+];
+const RELAPSE_PHRASES = [
+  "Hai ceduto oggi, succede quasi a tutti. Il record resta tuo e domani si riparte.",
+  "Una caduta non cancella i giorni che hai fatto. Domani riparti con più esperienza."
+];
+
+const FACTS = [
+  { t: "Ti metti in bocca i batteri delle feci",
+    hook: "Sotto le unghie si nasconde uno dei posti più sporchi del corpo, e il sapone non ci arriva bene.",
+    b: "Lo spazio tra l'unghia e il polpastrello trattiene sporco, pelle morta e batteri anche dopo che ti sei lavato le mani. Ci si trovano stafilococchi ed enterobatteri, la famiglia di E. coli, cioè batteri che arrivano dall'intestino. Uno studio su ragazzi che si mangiavano le unghie ha trovato E. coli in bocca molto più spesso che in chi non lo faceva. Ogni morso è un passaggio diretto da lì alla tua bocca.",
+    risks: ["Mal di pancia, diarrea e infezioni intestinali", "Raffreddori e influenze più frequenti", "Batteri che restano in bocca anche dopo"] },
+  { t: "Il dito che si gonfia di pus",
+    hook: "Si chiama paronichia ed è l'infezione della mano più comune in assoluto. Chi si mangia le unghie è in prima fila.",
+    b: "Ogni volta che strappi una pellicina o mordi troppo vicino alla carne apri una piccola ferita. Lì entrano i batteri della bocca e della pelle. Nel giro di un giorno o due il bordo dell'unghia diventa rosso, caldo, pulsa e si riempie di pus. Spesso il medico deve inciderlo con un bisturi per farlo uscire. Se viene trascurata, l'infezione può scendere più in profondità, fino ai tendini o all'osso del dito, e allora servono antibiotici forti o la chirurgia.",
+    risks: ["Dolore che pulsa e non ti fa dormire", "Incisione per drenare il pus", "Nei casi trascurati, infezione di tendini o osso"] },
+  { t: "Le unghie possono non ricrescere più bene",
+    hook: "Il danno non è solo quello che vedi: sotto la pelle c'è la fabbrica dell'unghia, e si può rompere.",
+    b: "L'unghia nasce da una zona nascosta sotto la pelle alla base del dito, la matrice. Se la torturi per anni, mordendo pellicine e cuticole, la matrice si danneggia. Allora l'unghia ricresce con solchi, righe, macchie, storta o più stretta. In più il letto ungueale, la parte rosa su cui poggia l'unghia, si accorcia: anche se smetti, le unghie possono rimanere corte e brutte per sempre.",
+    risks: ["Unghie rigate, ondulate o deformate", "Letto ungueale accorciato in modo permanente", "Dita che fanno male al minimo urto"] },
+  { t: "I denti pagano il conto",
+    hook: "Lo smalto non ricresce. Quello che consumi mordendo è perso per sempre.",
+    b: "Le unghie sono fatte di cheratina, un materiale duro come le corna degli animali. Morderle centinaia di volte al giorno crea microfratture sui denti davanti, che col tempo si scheggiano, si consumano e si spostano. Chi porta o ha portato l'apparecchio rischia di più: i denti sotto sforzo continuo possono accorciare le radici. Sistemare tutto dal dentista significa faccette, ricostruzioni e conti salati.",
+    risks: ["Denti davanti scheggiati o consumati", "Denti che si spostano e si storcono", "Radici più corte in chi porta l'apparecchio", "Conti dal dentista da centinaia di euro"] },
+  { t: "La mascella si inceppa",
+    hook: "Quello scrocchio quando apri la bocca può avere a che fare con le unghie.",
+    b: "Per mordere un'unghia tieni la mandibola spinta in avanti e stringi forte, una posizione innaturale. Ripetuta ogni giorno per anni sovraccarica l'articolazione tra mandibola e cranio, l'ATM. Il risultato può essere dolore davanti all'orecchio, mal di testa, rumori quando mastichi e, a volte, la tendenza a digrignare i denti di notte.",
+    risks: ["Dolore alla mascella e mal di testa", "Scrocchi e blocchi quando apri la bocca", "Digrignare i denti di notte"] },
+  { t: "Vermi che passano dalle dita alla bocca",
+    hook: "Gli ossiuri sono piccoli vermi intestinali e il loro mezzo di trasporto preferito sono proprio le unghie.",
+    b: "Le uova degli ossiuri sono microscopiche e si attaccano sotto le unghie. Toccando superfici, vestiti o lenzuola le raccogli senza accorgertene. Quando ti mangi le unghie le ingoi, si schiudono nell'intestino e il ciclo ricomincia. Chi si mangia le unghie è più esposto a prenderli e, una volta presi, a riprenderli di continuo, perché si reinfetta da solo.",
+    risks: ["Prurito forte, soprattutto di notte", "Sonno disturbato", "Reinfezioni continue anche dopo la cura"] },
+  { t: "L'herpes della bocca può finire sulle dita",
+    hook: "Esiste l'herpes del dito, e si prende proprio così.",
+    b: "Se hai avuto la febbre sulle labbra, il virus dell'herpes può passare dalla bocca alle piccole ferite intorno alle unghie. Ne nasce il patereccio erpetico: vescicole dolorose sul polpastrello, gonfiore e bruciore che durano settimane. Il virus poi resta nel corpo e può ripresentarsi sempre nello stesso punto.",
+    risks: ["Vescicole dolorose sul dito", "Settimane di bruciore e gonfiore", "Il virus può tornare nello stesso punto"] },
+  { t: "Le verruche traslocano",
+    hook: "Le verruche intorno alle unghie sono tra le più difficili da togliere, e i morsi le spargono.",
+    b: "Le verruche sono causate dal papillomavirus umano. Quando nascono attorno all'unghia, chi morde le pellicine le rompe e sparge il virus sulle altre dita, sulle labbra e in bocca. Quelle vicino all'unghia sono ostinate: spesso servono più sedute di azoto liquido, che fanno male, e possono tornare.",
+    risks: ["Verruche che si moltiplicano su più dita", "Verruche su labbra e bocca", "Cure dolorose e ripetute"] },
+  { t: "Quello che tocchi in un giorno",
+    hook: "Telefono, maniglie, soldi, carrello del supermercato, tastiere: tutto finisce sulle tue dita, e poi in bocca.",
+    b: "Gli schermi dei telefoni raccolgono molti batteri e li tocchi decine di volte all'ora. Le banconote passano per migliaia di mani. Chi si mangia le unghie porta le dita alla bocca molte volte al giorno senza neanche accorgersene, dando a virus e batteri la strada più corta per entrare nel corpo.",
+    risks: ["Più raffreddori, mal di gola e influenze", "Infezioni intestinali", "Germi presi da superfici che non pensi"] },
+  { t: "Le mani parlano di te",
+    hook: "Le mani sono tra le prime cose che le persone notano, anche se non te lo dicono.",
+    b: "A un colloquio, a un appuntamento, quando dai la mano a qualcuno o passi un oggetto, le dita sono in primo piano. Le unghie mangiate e le pellicine rosse vengono lette come segno di ansia o di poca cura, anche quando non è così. Smettere è uno dei cambiamenti più rapidi da vedere: in poche settimane le mani sembrano di un'altra persona.",
+    risks: ["Imbarazzo a mostrare le mani", "Mani nascoste in tasca o sotto il tavolo", "Un'impressione sbagliata su di te"] },
+  { t: "La buona notizia: ricrescono",
+    hook: "Le unghie delle mani crescono circa 3 millimetri al mese. In 4-6 mesi un'unghia si rinnova da capo.",
+    b: "Se la matrice non è ancora rovinata, il corpo ripara quasi tutto da solo. Dopo due o tre settimane i bordi si vedono già lisci. Dopo un paio di mesi le unghie coprono di nuovo il polpastrello e le pellicine guariscono. Ogni giorno che resisti è un pezzetto di unghia nuova che cresce.",
+    risks: [] }
+];
+
+/* ===== Date helpers (local calendar days) ===== */
+const pad = n => String(n).padStart(2, "0");
+const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+// The "day" ends at 3 at night: a check-in at 1:00 still counts for the evening before.
+const DAY_END_HOUR = 3, OPEN_HOUR = 22;
+const todayIso = () => iso(new Date(Date.now() - DAY_END_HOUR * 3600000));
+const checkinOpen = () => { const h = new Date().getHours(); return h >= OPEN_HOUR || h < DAY_END_HOUR; };
+// ?prova nell'indirizzo: il bottone funziona a qualsiasi ora (per le prove di Stella)
+let isOwner = /[?&]prova\b/.test(location.search);
+const toUTC = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d); };
+const diffDays = (a, b) => Math.round((toUTC(b) - toUTC(a)) / 86400000); // b - a
+const addDays = (s, n) => { const t = new Date(toUTC(s) + n * 86400000); return t.getUTCFullYear() + "-" + pad(t.getUTCMonth() + 1) + "-" + pad(t.getUTCDate()); };
+const fmt = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("it-IT", { day: "numeric", month: "long" }); };
+
+/* ===== State ===== */
+const KEY = "unghie-libere-v1";
+let state = null;      // { name, start, checkins:[], relapses:[], best, celebrated:[], updatedAt }
+
+function loadLocal() { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+function save() {
+  state.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  if (window.BACKEND) window.BACKEND.saveProgress(state).catch(() => {});
+}
+
+function streak() {
+  if (!state) return 0;
+  const t = todayIso();
+  const base = diffDays(state.start, t);
+  const checked = state.checkins.includes(t) ? 1 : 0;
+  return Math.max(0, base + checked);
+}
+function relapsedToday() { return state && state.relapses.some(r => r.date === todayIso()); }
+function checkedToday() { return state && state.checkins.includes(todayIso()); }
+
+/* ===== Render ===== */
+const $ = id => document.getElementById(id);
+let confirmOpen = false;
+
+function renderHero() {
+  const h = $("hero");
+  if (!state) {
+    h.innerHTML = `
+      <form class="setup" id="setup">
+        <div class="eyebrow">Si comincia</div>
+        <h1>Ciao Luca, conta i giorni senza mangiarti le unghie</h1>
+        <p class="hint">Ecco le regole. Leggile bene, valgono per tre mesi.</p>
+        <ul class="rules">
+          <li><b>Ogni sera dalle 22</b> premi "Oggi non le ho mangiate" e scopri la sorpresa della sera.</li>
+          <li><b>Le caselle gialle</b> nel calendario sono i traguardi speciali. Lì ti aspetta un premio vero di Stella.</li>
+          <li><b>I premi vinti</b> finiscono nella tua collezione. Spunta "Ricevuto" quando Stella te lo consegna.</li>
+          <li><b>Se cedi</b>, premi "Ho ceduto" e sii onesto. Si riparte da zero e i premi non ancora ritirati non valgono più.</li>
+        </ul>
+        <div class="field"><label for="in-start">Da quando non le mangi?</label><input id="in-start" type="date" value="${todayIso()}" max="${todayIso()}"><span class="hint">Se inizi oggi lascia la data di oggi.</span></div>
+        <button class="btn btn-main" type="submit">Inizia</button>
+      </form>`;
+    $("setup").addEventListener("submit", e => {
+      e.preventDefault();
+      const start = $("in-start").value || todayIso();
+      const s = start > todayIso() ? todayIso() : start;
+      state = { name: "Luca", daily: [], start: s, checkins: [], relapses: [], best: 0, celebrated: [], updatedAt: 0 };
+      // days before today count as already done
+      state.best = diffDays(s, todayIso());
+      state.celebrated = MILESTONES.filter(m => m.d <= state.best).map(m => m.d);
+      save(); render();
+    });
+    return;
+  }
+  const n = streak();
+  const t = todayIso();
+  const mm = (n * 0.1).toFixed(1).replace(".", ",");
+  const tip = Math.min(n * 0.1, 3) / 3; // visual fills up to 3 mm
+  let action;
+  if (relapsedToday()) {
+    action = `<div class="relapsed">Oggi è andata così. Domani si riparte da zero, con una collezione nuova da conquistare.</div>`;
+  } else if (checkedToday()) {
+    action = `<div class="actions"><button class="btn btn-done" type="button" disabled>Giornata segnata ✓</button>${todayPrize()}<button class="link" id="lapse" type="button">Ho ceduto</button></div>`;
+  } else {
+    const open = checkinOpen() || isOwner;
+    const btn = open
+      ? `<button class="btn btn-main" id="check" type="button">Oggi non le ho mangiate</button>`
+      : `<button class="btn btn-locked" type="button" disabled>Si sblocca alle 22:00</button><p class="hint" style="text-align:center">${untilOpen()}</p>`;
+    const ownerNote = isOwner && !checkinOpen() ? `<p class="hint" style="text-align:center">Modalità prova: il bottone funziona a qualsiasi ora. Luca lo vede attivo solo dalle 22.</p>` : "";
+    action = `<div class="actions">${btn}${ownerNote}<button class="link" id="lapse" type="button">Ho ceduto</button></div>`;
+  }
+  const confirm = confirmOpen ? `
+    <div class="confirm">
+      <p>Si riparte da zero domani: il contatore si azzera e i premi della collezione non ancora ritirati non valgono più. Resta solo il record di ${Math.max(state.best, n)} giorni.</p>
+      <div class="row"><button class="btn btn-danger" id="lapse-yes" type="button">Sì, ho ceduto</button><button class="btn btn-ghost" id="lapse-no" type="button">Annulla</button></div>
+    </div>` : "";
+  const sub = state.start > t ? "Riparti domani" : (checkedToday() ? `Dal ${fmt(state.start)}, oggi compreso` : `Dal ${fmt(state.start)}. Stasera dalle 22 segna la giornata e scopri la sorpresa.`);
+  h.innerHTML = `
+    <div class="hero-row">
+      <div>
+        <div class="count">${n}</div>
+        <div class="count-label">${n === 1 ? "giorno" : "giorni"} senza mangiarle</div>
+        <div class="count-sub">${sub}</div>
+      </div>
+      <div class="nail-fig" aria-label="Unghia ricresciuta di ${mm} millimetri">
+        ${nailSVG(tip)}
+        <div class="mm">+${mm} mm</div>
+        <div class="mm-l">di unghia ricresciuta</div>
+      </div>
+    </div>
+    ${action}${confirm}`;
+  const c = $("check"); if (c) c.addEventListener("click", checkIn);
+  const l = $("lapse"); if (l) l.addEventListener("click", () => { confirmOpen = true; renderHero(); });
+  const y = $("lapse-yes"); if (y) y.addEventListener("click", relapse);
+  const no = $("lapse-no"); if (no) no.addEventListener("click", () => { confirmOpen = false; renderHero(); });
+}
+
+function todayPrize() {
+  const x = (state.daily || []).find(d => d.date === todayIso());
+  if (!x) return "";
+  const m = MILESTONES.find(q => q.d === x.day);
+  if (!x.text && !(m && m.big)) return "";
+  const div = document.createElement("div"); div.textContent = x.text || "un premio a sorpresa da Stella";
+  return m && m.big
+    ? `<p class="hint" style="text-align:center">Traguardo speciale! Hai vinto: <b>${div.innerHTML}</b></p>`
+    : `<p class="hint" style="text-align:center">Stasera: <b>${div.innerHTML}</b></p>`;
+}
+function untilOpen() {
+  const now = new Date(), o = new Date(now); o.setHours(OPEN_HOUR, 0, 0, 0);
+  const mins = Math.max(0, Math.round((o - now) / 60000));
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return "Torna stasera: mancano " + (h ? h + (h === 1 ? " ora" : " ore") + (m ? " e " : "") : "") + (m ? m + " minuti" : "") + ". Ti aspetta una sorpresa.";
+}
+function nailSVG(f) {
+  // fingertip with nail; the white free edge grows with f (0..1)
+  const tipH = 2 + f * 22;
+  return `<svg viewBox="0 0 100 130" aria-hidden="true">
+    <path d="M14 130 V52 C14 22 32 8 50 8 C68 8 86 22 86 52 V130 Z" fill="var(--skin)"/>
+    <path d="M26 118 V56 C26 38 36 30 50 30 C64 30 74 38 74 56 V118 Z" fill="var(--nail)"/>
+    <path d="M26 ${56} C26 ${56 - tipH} 36 ${30 - tipH} 50 ${30 - tipH} C64 ${30 - tipH} 74 ${56 - tipH} 74 ${56} C74 50 64 40 50 40 C36 40 26 50 26 56 Z" fill="var(--nail-tip)" stroke="var(--line)" stroke-width="1"/>
+    <path d="M34 110 C40 104 60 104 66 110" stroke="var(--surface)" stroke-width="3" fill="none" opacity=".6"/>
+  </svg>`;
+}
+
+function renderQuote() {
+  let txt, eb = "Frase del giorno";
+  if (!state) { txt = EARLY[0]; }
+  else if (relapsedToday()) { txt = RELAPSE_PHRASES[state.relapses.length % RELAPSE_PHRASES.length]; eb = "Non mollare"; }
+  else {
+    const dayNo = Math.max(1, diffDays(state.start, todayIso()) + 1);
+    if (dayNo <= EARLY.length) { txt = EARLY[dayNo - 1]; eb = "Giorno " + dayNo; }
+    else { txt = POOL[(toUTC(todayIso()) / 86400000) % POOL.length]; eb = "Giorno " + dayNo; }
+  }
+  $("quote-eyebrow").textContent = eb;
+  $("quote").textContent = txt;
+}
+
+function renderNext() {
+  const n = streak();
+  const done = checkedToday() || relapsedToday();
+  $("next-eyebrow").textContent = done ? "La prossima sorpresa" : "La sorpresa di stasera";
+  $("next-reward").textContent = done ? "Domani sera, dalle 22" : (checkinOpen() ? "È pronta: segna la giornata" : "Si scopre alle 22");
+  const day = n + 1;
+  const target = MILESTONES.find(m => m.d === day);
+  const nbig = BIG.find(m => m.d >= day);
+  $("next-when").textContent = target && target.big
+    ? (done ? "Domani è un traguardo speciale: " : "Stasera è un traguardo speciale: ") + target.name + ". Ti aspetta un premio vero!"
+    : (nbig ? "Prossimo premio vero al giorno " + nbig.d + " (" + nbig.name + "). " + (nbig.d - n === 1 ? "Manca 1 giorno." : "Mancano " + (nbig.d - n) + " giorni.") : "");
+  const next = BIG.find(m => m.d > n);
+  if (!next) { $("bar-fill").style.width = "100%"; $("next-left").textContent = "Tutte le medaglie prese"; $("next-at").textContent = ""; return; }
+  const prev = [...BIG].reverse().find(m => m.d <= n);
+  const from = prev ? prev.d : 0;
+  const pct = Math.round(((n - from) / (next.d - from)) * 100);
+  $("bar-fill").style.width = pct + "%";
+  $("bar").setAttribute("aria-valuenow", pct);
+  const left = next.d - n;
+  $("next-left").textContent = "Prossimo traguardo: " + next.name + (left === 1 ? ", manca 1 giorno" : ", mancano " + left + " giorni");
+  $("next-at").textContent = n + " / " + next.d;
+}
+
+function renderBadges() {
+  const n = streak();
+  const best = state ? Math.max(state.best, n) : 0;
+  $("badges").innerHTML = MILESTONES.map(m => {
+    const cls = m.d <= n ? "on" : (m.d <= best ? "past" : "");
+    const isNext = m.d === n + 1 ? " next" : "";
+    return `<div class="cal ${cls}${isNext}${m.big ? " big" : ""}" title="${m.name}"><span>${m.d}</span></div>`;
+  }).join("");
+  const nb = BIG.find(m => m.d > n);
+  $("badges-note").textContent = n >= 90 ? "Tre mesi completati: tutte le medaglie sono tue." : (n + " medaglie su 90. Il prossimo premio vero è al traguardo" + (nb ? " " + nb.name.toLowerCase() + " (giorno " + nb.d + ")." : "."));
+}
+
+function factNode(f, open) {
+  const frag = document.createDocumentFragment();
+  const h = document.createElement(open ? "h3" : "b"); h.textContent = f.t;
+  const hk = document.createElement("p"); hk.className = "hook"; hk.textContent = f.hook;
+  const b = document.createElement("p"); b.textContent = f.b;
+  frag.append(h, hk, b);
+  if (f.risks.length) {
+    const lab = document.createElement("div"); lab.className = "eyebrow risk-l"; lab.textContent = "Cosa rischi";
+    const ul = document.createElement("ul"); ul.className = "risks";
+    f.risks.forEach(r => { const li = document.createElement("li"); li.textContent = r; ul.append(li); });
+    frag.append(lab, ul);
+  }
+  return frag;
+}
+function renderFacts() {
+  const idx = (toUTC(todayIso()) / 86400000) % FACTS.length;
+  $("fact").innerHTML = `<div class="eyebrow">Lo sapevi?</div>`;
+  $("fact").append(factNode(FACTS[idx], true));
+  const src = document.createElement("p"); src.className = "src"; src.textContent = "Ogni giorno una curiosità diversa. Le trovi tutte qui sotto.";
+  $("fact").append(src);
+  $("fact-list").innerHTML = "";
+  FACTS.forEach(x => { const li = document.createElement("li"); li.append(factNode(x, false)); $("fact-list").append(li); });
+}
+
+function renderHistory() {
+  const t = todayIso();
+  const n = streak();
+  $("s-best").textContent = state ? Math.max(state.best, n) : 0;
+  $("s-check").textContent = state ? state.checkins.length : 0;
+  $("s-relapse").textContent = state ? state.relapses.length : 0;
+  let html = "";
+  for (let i = 13; i >= 0; i--) {
+    const d = addDays(t, -i);
+    let cls = "";
+    if (state) {
+      if (state.relapses.some(r => r.date === d)) cls = "bad";
+      else if (state.checkins.includes(d)) cls = "ok";
+      else if (d >= state.start && d < t) cls = "pending";
+    }
+    html += `<div class="day ${cls}" title="${fmt(d)}"></div>`;
+  }
+  $("days").innerHTML = html;
+  $("who").textContent = "Forza, Luca";
+  renderCollection();
+}
+
+/* Consigli: due fissi, più tre a rotazione ogni giorno */
+const TIPS_FIXED = [
+  ["Chiudi la mano a pugno per 30 secondi", "Oppure stringi qualcosa: una pallina antistress, un elastico, una penna. La voglia passa in un minuto o due."],
+  ["Mani occupate", "Mentre guardi un film o sei al telefono, tieni qualcosa in mano o siediti sulle mani."]
+];
+const TIPS_POOL = [
+  ["Accorgitene e dai un nome alla voglia", "Stress, noia, TV, telefono? Sapere quando succede è metà del lavoro."],
+  ["Lima invece di mordere", "Tieni una limetta in tasca: se senti un bordo che dà fastidio, lo sistemi senza denti."],
+  ["Unghie corte e curate", "Meno bordi da afferrare, meno tentazione."],
+  ["Smalto amaro", "Si trova in farmacia ed è trasparente. Il sapore orribile ti avvisa appena porti un dito alla bocca."],
+  ["Cerotto sul dito preferito", "Ognuno ha un dito che morde di più. Coprilo con un cerotto per qualche giorno e il gesto si interrompe."],
+  ["Conta fino a 60", "Quando senti la voglia, guarda l'orologio e aspetta un minuto. Quasi sempre, finito il minuto, è passata."],
+  ["Bocca occupata", "Una gomma senza zucchero, una caramella o un sorso d'acqua: se la bocca è impegnata, le dita restano fuori."],
+  ["Crema per le mani", "Pellicine morbide significano meno pezzetti da strappare. Mettila la sera prima di dormire."],
+  ["Gioca con qualcosa", "Un anello da girare, un cubo antistress, una moneta tra le dita. Dai alle mani un lavoro diverso."],
+  ["Lavati le mani", "Quando ti viene voglia, vai a lavarle. Ti alzi, cambi attività e ti ricordi quanto è sporco quello che stavi per mettere in bocca."],
+  ["Respira in quattro tempi", "Inspira per 4 secondi, trattieni per 4, butta fuori per 4, aspetta 4. Due giri bastano a calmare la tensione."],
+  ["Guanti o mani in tasca", "Davanti a una partita o a una serie, le mani in tasca o in un cuscino tolgono il gesto automatico."],
+  ["Scatta una foto alle mani", "Una a settimana, sempre con la stessa luce. Vedere la differenza motiva più di qualsiasi frase."],
+  ["Avvisa un amico", "Chiedi a chi ti sta vicino di farti un segno quando ti vede con le dita in bocca. Senza prediche, solo un segno."],
+  ["Occhio ai momenti a rischio", "Guida, telefonate, esami, film: preparati prima con qualcosa in mano."],
+  ["Pellicina che dà fastidio? Tagliala", "Usa un tagliaunghie o delle forbicine, mai i denti. Un taglio netto non lascia bordi da mordere."],
+  ["Muoviti", "Se la voglia è forte, alzati e fai due passi, anche solo fino alla cucina. Cambiare posizione spezza il gesto."],
+  ["Premiati da solo", "Oltre ai premi di Stella, decidi tu una piccola cosa che ti concedi ogni volta che resisti a una voglia forte."]
+];
+function renderTips() {
+  const dayNo = Math.floor(toUTC(todayIso()) / 86400000);
+  const pick = [0, 1, 2].map(i => TIPS_POOL[(dayNo * 3 + i) % TIPS_POOL.length]);
+  $("tips").innerHTML = "";
+  [...TIPS_FIXED, ...pick].forEach(([t, b], i) => {
+    const li = document.createElement("li");
+    const bb = document.createElement("b"); bb.textContent = t;
+    const sp = document.createElement("span"); sp.textContent = b;
+    li.append(bb, sp);
+    if (i >= TIPS_FIXED.length) { const tag = document.createElement("span"); tag.className = "eyebrow"; tag.textContent = "Consiglio di oggi"; li.prepend(tag); }
+    $("tips").append(li);
+  });
+}
+
+function renderCollection() {
+  const won = state ? (state.trophies || []) : [];
+  $("coll").innerHTML = "";
+  BIG.forEach(m => {
+    const t = won.find(x => x.day === m.d);
+    const li = document.createElement("li");
+    const cm = document.createElement("div"); cm.className = "cm"; cm.textContent = m.d;
+    const ct = document.createElement("div"); ct.className = "ct";
+    const b = document.createElement("b"); b.textContent = t ? t.name : m.name;
+    const sp = document.createElement("span");
+    ct.append(b, sp); li.append(cm, ct);
+    if (t) {
+      li.className = t.got ? "won got" : "won";
+      sp.textContent = t.prize || "Premio a sorpresa da Stella";
+      const lab = document.createElement("label");
+      const cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "got-" + m.d; cb.checked = !!t.got;
+      cb.addEventListener("change", () => { t.got = cb.checked; save(); renderCollection(); if (cb.checked) party(true); });
+      lab.append(cb, document.createTextNode("Ricevuto"));
+      li.append(lab);
+    } else {
+      sp.textContent = "Si sblocca al giorno " + m.d + ". Premio segreto.";
+      li.append(document.createElement("span"));
+    }
+    $("coll").append(li);
+  });
+}
+
+function render() { $("howto").hidden = !state; renderHero(); renderQuote(); renderNext(); renderBadges(); renderFacts(); renderTips(); renderHistory(); }
+
+/* ===== Actions ===== */
+function checkIn() {
+  if (!checkinOpen() && !isOwner) { render(); return; }
+  const t = todayIso();
+  if (!state.checkins.includes(t)) state.checkins.push(t);
+  const n = streak();
+  if (n > state.best) state.best = n;
+  const m = MILESTONES.find(x => x.d === n);
+  if (!state.daily) state.daily = [];
+  const prize = prizeFor(n);
+  if (!state.daily.some(x => x.date === t)) state.daily.push({ date: t, day: n, text: prize });
+  if (!state.trophies) state.trophies = [];
+  if (m && m.big && !state.trophies.some(x => x.day === n)) state.trophies.push({ day: n, name: m.name, prize: prize, date: t, got: false });
+  save(); render();
+  celebrate(m, n, prize);
+}
+function relapse() {
+  const t = todayIso();
+  const n = streak();
+  if (n > state.best) state.best = n;
+  state.checkins = state.checkins.filter(d => d !== t);
+  state.relapses.push({ date: t, days: n });
+  state.start = addDays(t, 1);
+  // si riparte da capo: la collezione si svuota e i traguardi vanno riconquistati
+  state.oldTrophies = (state.oldTrophies || []).concat((state.trophies || []).map(x => Object.assign({ lostOn: t }, x)));
+  state.trophies = [];
+  confirmOpen = false;
+  save(); render();
+}
+const PARTY_COLORS = ["#ff4f8b", "#ffb703", "#3ec1d3", "#8e6cff", "#2ec27e", "#ff7a3d"];
+function party(big) {
+  const layer = document.createElement("div"); layer.className = "party"; layer.setAttribute("aria-hidden", "true");
+  const nb = big ? 18 : 11;
+  for (let i = 0; i < nb; i++) {
+    const b = document.createElement("div"); b.className = "balloon";
+    const c = PARTY_COLORS[i % PARTY_COLORS.length];
+    const size = 0.75 + Math.random() * 0.5;
+    b.style.cssText = `left:${Math.random() * 92}%;background:${c};--c:${c};--dur:${(3.6 + Math.random() * 2.4).toFixed(2)}s;--delay:${(Math.random() * 0.9).toFixed(2)}s;--sway:${Math.round(Math.random() * 60 - 30)}px;transform-origin:center;scale:${size.toFixed(2)}`;
+    b.append(document.createElement("i"));
+    layer.append(b);
+  }
+  if (big) {
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement("div"); c.className = "confetto";
+      c.style.cssText = `left:${Math.random() * 100}%;background:${PARTY_COLORS[i % PARTY_COLORS.length]};--dur:${(2.4 + Math.random() * 2).toFixed(2)}s;--delay:${(Math.random() * 1.2).toFixed(2)}s;--sway:${Math.round(Math.random() * 160 - 80)}px;--rot:${Math.round(Math.random() * 900 - 450)}deg`;
+      layer.append(c);
+    }
+  }
+  const y = document.createElement("div"); y.className = "yuppi"; y.textContent = big ? "Yuppi!!" : "Yuppi!"; layer.append(y);
+  document.body.append(layer);
+  setTimeout(() => layer.remove(), 8000);
+}
+function celebrate(m, n, prize) {
+  const big = m && m.big;
+  party(big);
+  $("cele-medal").textContent = n;
+  $("cele-eyebrow").textContent = big ? "Traguardo speciale: " + m.name : "Medaglia del giorno " + n;
+  $("cele-title").textContent = "Bravo, ce l'hai fatta!";
+  $("cele-text").textContent = n === 1 ? "Il primo giorno è fatto. Il più difficile." : n + " giorni senza mangiarti le unghie.";
+  $("cele-prize").hidden = !prize && !big;
+  $("cele-prize").textContent = big ? "Hai vinto: " + (prize || "un premio a sorpresa da Stella") : prize;
+  $("cele-claim").hidden = !big;
+  $("overlay").hidden = false;
+  $("cele-close").focus();
+}
+$("cele-close").addEventListener("click", () => { $("overlay").hidden = true; });
+$("wipe").addEventListener("click", () => { $("wipe-confirm").hidden = false; });
+$("wipe-no").addEventListener("click", () => { $("wipe-confirm").hidden = true; });
+$("wipe-yes").addEventListener("click", () => {
+  state = null;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  $("wipe-confirm").hidden = true; render(); window.scrollTo(0, 0);
+});
+
+/* ===== Premi da premi.json + pannello di Stella ===== */
+async function loadPrizes() {
+  try {
+    const res = await fetch("premi.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const j = await res.json();
+    if (Array.isArray(j.giorni)) PRIZES = j.giorni.map(String);
+    if (j.traguardi && typeof j.traguardi === "object") { SPECIAL = {}; for (const k in j.traguardi) if (String(j.traguardi[k]).trim()) SPECIAL[k] = String(j.traguardi[k]).trim(); buildMilestones(); }
+    render();
+  } catch (e) {}
+}
+/* ===== Boot ===== */
+state = loadLocal();
+render();
+loadPrizes();
+// refresh at midnight / when the app comes back to the foreground
+let lastDay = todayIso();
+document.addEventListener("visibilitychange", () => { if (!document.hidden && todayIso() !== lastDay) { lastDay = todayIso(); render(); } });
+setInterval(() => { lastDay = todayIso(); if (state) render(); }, 60000);
+
+// Sincronizza con il server (se configurato) e carica i premi
+if (window.BACKEND) window.BACKEND.boot().catch(() => {});
+</script>
+</body>
+</html>
