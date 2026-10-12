@@ -813,9 +813,19 @@ $("wipe-yes").addEventListener("click", () => {
 /* ===== Premi da premi.json + pannello di Stella ===== */
 async function loadPrizes() {
   try {
-    const res = await fetch("premi.json", { cache: "no-store" });
-    if (!res.ok) return;
-    const j = await res.json();
+    let j = null;
+    const db = window.PREMI_DB;
+    if (db) {
+      try {
+        const r = await fetch(db.url + "/rest/v1/premi?id=eq.1&select=dati", { headers: { apikey: db.key }, cache: "no-store" });
+        if (r.ok) { const rows = await r.json(); if (rows[0] && rows[0].dati) j = rows[0].dati; }
+      } catch (e) {}
+    }
+    if (!j) {
+      const res = await fetch("premi.json", { cache: "no-store" });
+      if (!res.ok) return;
+      j = await res.json();
+    }
     if (Array.isArray(j.giorni)) PRIZES = j.giorni.map(String);
     if (j.traguardi && typeof j.traguardi === "object") { SPECIAL = {}; for (const k in j.traguardi) if (String(j.traguardi[k]).trim()) SPECIAL[k] = String(j.traguardi[k]).trim(); buildMilestones(); }
     render();
