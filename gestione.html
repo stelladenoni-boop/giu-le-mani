@@ -47,6 +47,24 @@ input:focus-visible, .btn:focus-visible, .link:focus-visible { outline: 3px soli
 .arow.big .dn { background: var(--gift); color: var(--gift-ink); }
 .arow input.ms { font-size: .88rem; padding: 8px 12px; }
 .arow input.ms:not(:placeholder-shown) { border-color: var(--gift-ink); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--sunk); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 1.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat.main .v { color: var(--accent); }
+.stat .l { font-size: .78rem; color: var(--muted); }
+.days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+.day { aspect-ratio: 1; border-radius: 6px; background: var(--sunk); }
+.day.ok { background: var(--good); }
+.day.pending { background: transparent; box-shadow: inset 0 0 0 2px var(--good); }
+.day.bad { background: var(--danger); }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: .92rem; }
+.plist li { background: var(--sunk); border-radius: 12px; padding: 9px 12px; display: flex; justify-content: space-between; gap: 10px; }
+.plist .got { color: var(--good); font-weight: 700; white-space: nowrap; }
+.plist .todo { color: var(--gift-ink); font-weight: 700; white-space: nowrap; }
+h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 4px 0 0; }
 .bar { position: sticky; bottom: 0; background: var(--bg); padding: 10px 0 calc(env(safe-area-inset-bottom, 0px) + 6px); display: flex; flex-direction: column; gap: 4px; }
 </style>
 </head>
@@ -65,6 +83,12 @@ input:focus-visible, .btn:focus-visible, .link:focus-visible { outline: 3px soli
   </section>
 
   <div id="editor" hidden style="display:flex;flex-direction:column;gap:16px">
+    <section class="card" id="prog">
+      <h2>I progressi di Luca</h2>
+      <div id="prog-body"><p class="hint">Carico...</p></div>
+      <button class="link" type="button" id="prog-reload">Aggiorna</button>
+    </section>
+
     <section class="card">
       <p class="hint">Ogni sera Luca vede "Bravo, ce l'hai fatta" più quello che scrivi nella prima casella di quel giorno. Nei giorni normali scrivi una frase, oppure lascia vuoto per un semplice Bravo. Se nella seconda casella scrivi un nome, quel giorno diventa un traguardo speciale (casella gialla nel suo calendario) e la prima casella è il premio vero, che finisce nella sua collezione. Luca non vede niente di tutto questo in anticipo.</p>
       <div class="filters" role="group" aria-label="Quali giorni mostrare">
@@ -164,6 +188,7 @@ async function enter(p, silent) {
     try { localStorage.setItem(PWKEY, p); } catch (e) {}
     buildRows(await loadData());
     $("login").hidden = true; $("editor").hidden = false;
+    loadProgress();
   } catch (e) {
     setMsg($("login-msg"), "Non riesco a collegarmi. Controlla la connessione e riprova.", "err");
   } finally { $("login-btn").disabled = false; }
@@ -203,6 +228,69 @@ $("logout").addEventListener("click", () => {
 });
 
 window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ===== Progressi di Luca ===== */
+const pad = n => String(n).padStart(2, "0");
+const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const todayIso = () => iso(new Date(Date.now() - 3 * 3600000)); // come nell'app: la sera finisce alle 3
+const toUTC = x => { const [y, m, d] = x.split("-").map(Number); return Date.UTC(y, m - 1, d); };
+const diffDays = (a, b) => Math.round((toUTC(b) - toUTC(a)) / 86400000);
+const addDays = (x, n) => { const t = new Date(toUTC(x) + n * 86400000); return t.getUTCFullYear() + "-" + pad(t.getUTCMonth() + 1) + "-" + pad(t.getUTCDate()); };
+const fmt = x => { const [y, m, d] = x.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("it-IT", { day: "numeric", month: "long" }); };
+const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function when(ts) {
+  const d = new Date(ts); const mins = Math.round((Date.now() - d) / 60000);
+  if (mins < 2) return "proprio adesso";
+  if (mins < 60) return mins + " minuti fa";
+  return d.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }) + " alle " + d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+}
+async function loadProgress() {
+  const box = $("prog-body");
+  try {
+    const r = await rpc("leggi_progressi", { pwd });
+    if (!r) { box.innerHTML = '<p class="hint">La password non è più valida. Esci e rientra.</p>'; return; }
+    const st = r.dati;
+    if (r.nessuno || !st || !st.start) {
+      box.innerHTML = '<p class="hint">Ancora niente: i progressi arrivano qui appena Luca apre l\'app (dopo questo aggiornamento) e ha scelto la data di inizio.</p>';
+      return;
+    }
+    const t = todayIso();
+    const checkins = st.checkins || [], relapses = st.relapses || [], trophies = st.trophies || [];
+    const n = Math.max(0, diffDays(st.start, t) + (checkins.includes(t) ? 1 : 0));
+    const best = Math.max(st.best || 0, n);
+    let days = "";
+    for (let i = 13; i >= 0; i--) {
+      const d = addDays(t, -i); let cls = "";
+      if (relapses.some(x => x.date === d)) cls = "bad";
+      else if (checkins.includes(d)) cls = "ok";
+      else if (d >= st.start && d < t) cls = "pending";
+      days += `<div class="day ${cls}" title="${fmt(d)}"></div>`;
+    }
+    const tonight = relapses.some(x => x.date === t) ? "Stasera ha segnato che ha ceduto."
+      : checkins.includes(t) ? "Stasera ha già segnato: ce l'ha fatta." : "Stasera non ha ancora segnato.";
+    const coll = trophies.length
+      ? '<ul class="plist">' + trophies.map(x => `<li><span>Giorno ${esc(x.day)}: ${esc(x.prize || x.name)}</span>${x.got ? '<span class="got">Ricevuto</span>' : '<span class="todo">Da consegnare</span>'}</li>`).join("") + "</ul>"
+      : '<p class="hint">Nessun premio vinto in questo giro, per ora.</p>';
+    const rel = relapses.length
+      ? '<ul class="plist">' + relapses.slice().reverse().map(x => `<li><span>${fmt(x.date)}</span><span>dopo ${esc(x.days)} giorni</span></li>`).join("") + "</ul>"
+      : '<p class="hint">Mai ceduto finora.</p>';
+    box.innerHTML = `
+      <div class="stats">
+        <div class="stat main"><span class="v">${n}</span><span class="l">giorni di fila</span></div>
+        <div class="stat"><span class="v">${best}</span><span class="l">record</span></div>
+        <div class="stat"><span class="v">${relapses.length}</span><span class="l">volte ceduto</span></div>
+      </div>
+      <p class="hint" style="margin-top:10px">${tonight} Giro attuale iniziato il ${fmt(st.start)}. Ultimo aggiornamento dal suo telefono: ${when(r.aggiornato)}.</p>
+      <h3>Ultime 14 sere</h3>
+      <div class="days">${days}</div>
+      <div class="legend"><span><i style="background:var(--good)"></i>Ce l'ha fatta</span><span><i style="box-shadow:inset 0 0 0 2px var(--good)"></i>Dimenticato di segnarlo</span><span><i style="background:var(--danger)"></i>Ha ceduto</span></div>
+      <h3>Premi vinti in questo giro</h3>${coll}
+      <h3>Quando ha ceduto</h3>${rel}`;
+  } catch (e) {
+    box.innerHTML = '<p class="hint">Non riesco a caricare i progressi. Controlla la connessione e premi Aggiorna.</p>';
+  }
+}
+$("prog-reload").addEventListener("click", loadProgress);
 
 let saved = null;
 try { saved = localStorage.getItem(PWKEY); } catch (e) {}

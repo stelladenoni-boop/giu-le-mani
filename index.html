@@ -807,6 +807,7 @@ $("wipe-no").addEventListener("click", () => { $("wipe-confirm").hidden = true; 
 $("wipe-yes").addEventListener("click", () => {
   state = null;
   try { localStorage.removeItem(KEY); } catch (e) {}
+  if (window.BACKEND) window.BACKEND.saveProgress(null).catch(() => {});
   $("wipe-confirm").hidden = true; render(); window.scrollTo(0, 0);
 });
 
